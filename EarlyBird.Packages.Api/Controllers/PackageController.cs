@@ -25,30 +25,26 @@ namespace EarlyBird.Packages.Api.Controllers
 
         [Produces("application/json")]
         [HttpGet("/package/{kolliid}")]
-        public async Task<ActionResult<PackageModel>> GetPackageDetails(int kolliid)
+        public async Task<ActionResult<PackageModel>> GetPackageDetails(string kolliid)
         {
-            var result = await _packageService.GetPackageDetails(kolliid);
-            return OkOrNotFound(result);
+            if (Validations.IsSearchKolliidValid(kolliid))
+            {
+                var result = await _packageService.GetPackageDetails(int.Parse(kolliid));
+                return OkOrNotFound(result);
+            }
+            return InvalidInputParameters();
         }
 
         [Produces("application/json")]
         [HttpPost("/package")]
         public async Task<IActionResult> CreatePackage([FromBody] PackageModel packageModel)
         {
-            try
+            if (Validations.PackageIsValid(packageModel))
             {
-                if (PackageValidations.PackageIsValid(packageModel))
-                {
-                    await _packageService.CreatePackage(packageModel);
-                    return Ok();
-                }
-
-                return InvalidInputParameters();
+                await _packageService.CreatePackage(packageModel);
+                return Ok();
             }
-            catch (Exception e)
-            {
-                return ExceptionToActionResult(e);
-            }
+            return PackageDimensionsInvalid();
         }
     }
 }

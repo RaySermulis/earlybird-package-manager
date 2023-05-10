@@ -19,10 +19,18 @@ namespace EarlyBird.Packages.Api.Controllers
             Console.Error.WriteLine("*Error Error*. " + ex.Message + ' ' + ex.InnerException + ' ' + ex.StackTrace);
             return BadRequest(ex);
         }
-        protected IActionResult InvalidInputParameters()
+        protected ActionResult InvalidInputParameters()
         {
             var response = new ErrorResponse();
             response.AddError(new Error("Input parameters are invalid", "INVALID_INPUT", 400, "INPUT"));
+            return BadRequest(response);
+        }
+
+        //todo pass list of errors 
+        protected IActionResult PackageDimensionsInvalid()
+        {
+            var response = new ErrorResponse();
+            response.AddError(new Error("Package dimensions are not valid", "Range_Not_Satisfiable", 416, "INPUT"));
             return BadRequest(response);
         }
     }
