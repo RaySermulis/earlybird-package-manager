@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EarlyBird.Packages.Api.Errors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EarlyBird.Packages.Api.Controllers
 {
@@ -17,6 +18,12 @@ namespace EarlyBird.Packages.Api.Controllers
 
             Console.Error.WriteLine("*Error Error*. " + ex.Message + ' ' + ex.InnerException + ' ' + ex.StackTrace);
             return BadRequest(ex);
+        }
+        protected IActionResult InvalidInputParameters()
+        {
+            var response = new ErrorResponse();
+            response.AddError(new Error("Input parameters are invalid", "INVALID_INPUT", 400, "INPUT"));
+            return BadRequest(response);
         }
     }
 }

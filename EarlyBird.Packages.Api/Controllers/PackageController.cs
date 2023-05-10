@@ -37,8 +37,13 @@ namespace EarlyBird.Packages.Api.Controllers
         {
             try
             {
-                await _packageService.CreatePackage(packageModel);
-                return Ok();
+                if (PackageValidations.PackageIsValid(packageModel))
+                {
+                    await _packageService.CreatePackage(packageModel);
+                    return Ok();
+                }
+
+                return InvalidInputParameters();
             }
             catch (Exception e)
             {
