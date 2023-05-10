@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EarlyBird.Packages.DAL\EarlyBird.Packages.DAL.csproj" />
+    <PackageReference Include="MicroService.Common" Version="5.2.3" />
   </ItemGroup>
 
 </Project>

@@ -12,9 +12,9 @@ namespace EarlyBird.Packages.Service
 
     public class PackageService : IPackageService
     {
-        private PackageRepository _packageRepository;
+        private readonly IPackageRepository _packageRepository;
 
-        public PackageService(PackageRepository packageRepository)
+        public PackageService(IPackageRepository packageRepository)
         {
             _packageRepository = packageRepository;
         }
