@@ -1,13 +1,14 @@
-﻿using EarlyBird.Packages.DAL.Models;
+﻿using EarlyBird.Packages.DAL.Mappers;
+using EarlyBird.Packages.DAL.Models;
 using EarlyBird.Packages.DAL.Repositories;
 
 namespace EarlyBird.Packages.Service
 {
     public interface IPackageService
     {
-        Task<List<Package>> GetAllPackages();
-        void GetPackageDetails();
-        void CreatePackage();
+        Task<List<PackageModel>> GetAllPackages();
+        Task<PackageModel> GetPackageDetails(int kolliid);
+        Task CreatePackage(PackageModel package);
     }
 
     public class PackageService : IPackageService
@@ -19,19 +20,20 @@ namespace EarlyBird.Packages.Service
             _packageRepository = packageRepository;
         }
 
-        public async Task<List<Package>> GetAllPackages()
+        public async Task<List<PackageModel>> GetAllPackages()
         {
-            return await _packageRepository.GetAllPackages();
+            var packages = _packageRepository.GetAllPackages();
+            return packages.Result.Select(PackageMapper.ToModel).ToList();
         }
 
-        public void GetPackageDetails()
+        public async Task<PackageModel> GetPackageDetails(int kolliid)
         {
-            throw new NotImplementedException();
+            return PackageMapper.ToModel(await _packageRepository.GetPackageDetails(kolliid));
         }
 
-        public void CreatePackage()
+        public async Task CreatePackage(PackageModel package)
         {
-            throw new NotImplementedException();
+            await _packageRepository.CreatePackage(PackageMapper.ToEntity(package));
         }
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EarlyBird.Packages.Api.Controllers
 {
-    public class PackageController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PackageController : BaseController
     {
         private readonly IPackageService _packageService;
 
@@ -14,18 +16,34 @@ namespace EarlyBird.Packages.Api.Controllers
 
         [Produces("application/json")]
         [HttpGet]
-        [Route("/package")]
-        public async Task<IActionResult> GetAllPackages() => Ok(await _packageService.GetAllPackages());
+        public async Task<ActionResult<List<PackageModel>>> GetAllPackages()
+        {
+            var result = await _packageService.GetAllPackages();
+            return OkOrNotFound(result);
+        }
 
 
         [Produces("application/json")]
-        [HttpGet]
-        [Route("/package/{kolliid}")]
-        public async Task<IActionResult> GetPackageSize(int kolliid) => Ok();
+        [HttpGet("/package/{kolliid}")]
+        public async Task<ActionResult<PackageModel>> GetPackageDetails(int kolliid)
+        {
+            var result = await _packageService.GetPackageDetails(kolliid);
+            return OkOrNotFound(result);
+        }
 
         [Produces("application/json")]
-        [HttpPost]
-        [Route("/package")]
-        public async Task<IActionResult> CreatePackage() => Ok();
+        [HttpPost("/package")]
+        public async Task<IActionResult> CreatePackage([FromBody] PackageModel packageModel)
+        {
+            try
+            {
+                await _packageService.CreatePackage(packageModel);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return ExceptionToActionResult(e);
+            }
+        }
     }
 }
