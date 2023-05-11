@@ -8,6 +8,7 @@ namespace EarlyBird.Packages.DAL
         public static void RegisterDAL(this IServiceCollection services)
         {
             services.AddTransient<IPackageRepository, PackageRepository>();
+            services.AddMemoryCache();
         }
     }
 }

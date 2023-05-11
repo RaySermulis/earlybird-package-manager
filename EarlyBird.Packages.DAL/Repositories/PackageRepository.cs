@@ -1,48 +1,60 @@
 ﻿using EarlyBird.Packages.DAL.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EarlyBird.Packages.DAL.Repositories
 {
     public interface IPackageRepository
     {
-        Task<List<Package>> GetAllPackages();
-        Task<Package> GetPackageDetails(int kolliid);
-
-        Task CreatePackage(Package package);
+        List<Package> GetAllPackages();
+        Package GetPackageDetails(int kolliid);
+        bool CreatePackage(Package package);
     }
 
     public class PackageRepository : IPackageRepository
     {
-        public async Task<List<Package>> GetAllPackages()
+        private readonly IMemoryCache _memoryCache;
+        private readonly MemoryCacheEntryOptions memoryCacheEntryOptions;
+
+        public PackageRepository(IMemoryCache memoryCache)
         {
-            return await Packages();
+            _memoryCache = memoryCache;
+            memoryCacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(new TimeSpan(0, 60, 0));
         }
 
-        public Task<Package> GetPackageDetails(int kolliid)
+        public List<Package> GetAllPackages()
         {
-            var details = Packages().Result.FirstOrDefault(x => x.Kolliid == kolliid);
-            if (details != null)
-            {
-                return Task.FromResult(details);
-            }
-
-            return null;
+            var packages = GetCachePackages();
+            return packages?.SelectMany(x => x.Values).ToList() ?? new List<Package>();
         }
 
-        public Task CreatePackage(Package package)
+        public Package GetPackageDetails(int kolliid)
         {
-            if (GetPackageDetails(package.Kolliid) is not null)
+            var details = GetAllPackages()?.FirstOrDefault(x => x.Kolliid == kolliid);
+            return details;
+        }
+
+        public bool CreatePackage(Package package)
+        {
+            var packageDetails = GetPackageDetails(package.Kolliid);
+            if (packageDetails != null)
             {
                 throw new Exception("error: package already exists");
             }
 
-            return Task.CompletedTask;
+            var packages = GetCachePackages() ?? new List<Dictionary<int, Package>>();
+            if (packages.Any(x => x.ContainsKey(package.Kolliid)))
+            {
+                throw new Exception("error: package already exists");
+            }
+            packages.Add(new Dictionary<int, Package> { { package.Kolliid, package } });
+            _memoryCache.Set("packages", packages, memoryCacheEntryOptions);
+            return true;
         }
 
-        private Task<List<Package>> Packages() => Task.FromResult<List<Package>>(new()
+        private List<Dictionary<int, Package>> GetCachePackages()
         {
-            new() {Kolliid = 1, Height = 5, Length = 10, Weight = 10, Width = 30},
-            new() {Kolliid = 2, Height = 15, Length = 20, Weight = 15, Width = 40},
-            new() {Kolliid = 3, Height = 25, Length = 30, Weight = 20, Width = 60}
-        });
+            _memoryCache.TryGetValue("packages", out List<Dictionary<int, Package>> packages);
+            return packages;
+        }
     }
 }

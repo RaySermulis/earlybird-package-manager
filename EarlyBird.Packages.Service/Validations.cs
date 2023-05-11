@@ -7,10 +7,15 @@
         private const int MaxLength = 60;
         private const int MaxWidth = 60;
 
-        //todo return dimension errors
-        public static bool PackageIsValid(PackageModel package)
+        public static List<string> ValidateDimensions(PackageModel package)
         {
-            return !(package.Height > MaxHeight) && !(package.Weight > MaxWeight) && !(package.Length > MaxLength) && !(package.Width > MaxWidth);
+            var errors = new List<string>();
+            if (package.Height > MaxHeight) errors.Add($"MaxHeight: {MaxHeight}");
+            if (package.Weight > MaxWeight) errors.Add($"MaxWeight: {MaxWeight}");
+            if (package.Length > MaxLength) errors.Add($"MaxLength: {MaxLength}");
+            if (package.Width > MaxWidth) errors.Add($"MaxWidth: {MaxWidth}");
+
+            return errors;
         }
 
         public static bool IsSearchKolliidValid(string kolliid)

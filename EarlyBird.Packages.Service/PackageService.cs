@@ -6,9 +6,9 @@ namespace EarlyBird.Packages.Service
 {
     public interface IPackageService
     {
-        Task<List<PackageModel>> GetAllPackages();
-        Task<PackageModel> GetPackageDetails(int kolliid);
-        Task CreatePackage(PackageModel package);
+        List<PackageModel> GetAllPackages();
+        PackageModel GetPackageDetails(int kolliid);
+        bool CreatePackage(PackageModel package);
     }
 
     public class PackageService : IPackageService
@@ -20,20 +20,20 @@ namespace EarlyBird.Packages.Service
             _packageRepository = packageRepository;
         }
 
-        public async Task<List<PackageModel>> GetAllPackages()
+        public List<PackageModel> GetAllPackages()
         {
             var packages = _packageRepository.GetAllPackages();
-            return packages.Result.Select(PackageMapper.ToModel).ToList();
+            return packages.Select(PackageMapper.ToModel).ToList();
         }
 
-        public async Task<PackageModel> GetPackageDetails(int kolliid)
+        public PackageModel GetPackageDetails(int kolliid)
         {
-            return PackageMapper.ToModel(await _packageRepository.GetPackageDetails(kolliid));
+            return PackageMapper.ToModel(_packageRepository.GetPackageDetails(kolliid));
         }
 
-        public async Task CreatePackage(PackageModel package)
+        public bool CreatePackage(PackageModel package)
         {
-            await _packageRepository.CreatePackage(PackageMapper.ToEntity(package));
+            return _packageRepository.CreatePackage(PackageMapper.ToEntity(package));
         }
     }
 }

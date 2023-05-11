@@ -18,7 +18,7 @@ namespace EarlyBird.Packages.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<PackageModel>>> GetAllPackages()
         {
-            var result = await _packageService.GetAllPackages();
+            var result = _packageService.GetAllPackages();
             return OkOrNotFound(result);
         }
 
@@ -29,7 +29,7 @@ namespace EarlyBird.Packages.Api.Controllers
         {
             if (Validations.IsSearchKolliidValid(kolliid))
             {
-                var result = await _packageService.GetPackageDetails(int.Parse(kolliid));
+                var result = _packageService.GetPackageDetails(int.Parse(kolliid));
                 return OkOrNotFound(result);
             }
             return InvalidInputParameters();
@@ -39,12 +39,26 @@ namespace EarlyBird.Packages.Api.Controllers
         [HttpPost("/package")]
         public async Task<IActionResult> CreatePackage([FromBody] PackageModel packageModel)
         {
-            if (Validations.PackageIsValid(packageModel))
+            try
             {
-                await _packageService.CreatePackage(packageModel);
+                var dimensionErrors = Validations.ValidateDimensions(packageModel);
+                var isKolliiFormatCorect = Validations.IsSearchKolliidValid(packageModel.Kolliid);
+                if (dimensionErrors.Count != 0)
+                {
+                    return PackageDimensionsInvalid(dimensionErrors);
+                }
+
+                if (isKolliiFormatCorect)
+                {
+                    return InvalidInputParameters();
+                }
+                _packageService.CreatePackage(packageModel);
                 return Ok();
             }
-            return PackageDimensionsInvalid();
+            catch (Exception e)
+            {
+                return ExceptionToActionResult(e);
+            }
         }
     }
 }

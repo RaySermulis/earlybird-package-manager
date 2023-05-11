@@ -9,7 +9,7 @@ namespace EarlyBird.Packages.DAL.Mappers
         {
             return new PackageModel
             {
-                Kolliid = package.Kolliid,
+                Kolliid = package.Kolliid.ToString(),
                 Height = package.Height,
                 Width = package.Width,
                 Length = package.Length,
@@ -21,7 +21,7 @@ namespace EarlyBird.Packages.DAL.Mappers
         {
             return new Package
             {
-                Kolliid = model.Kolliid,
+                Kolliid = int.Parse(model.Kolliid),
                 Height = model.Height,
                 Width = model.Width,
                 Length = model.Length,

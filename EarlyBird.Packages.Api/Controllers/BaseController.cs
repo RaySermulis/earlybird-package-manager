@@ -27,10 +27,11 @@ namespace EarlyBird.Packages.Api.Controllers
         }
 
         //todo pass list of errors 
-        protected IActionResult PackageDimensionsInvalid()
+        protected IActionResult PackageDimensionsInvalid(List<string> messages)
         {
+            var errorMessages = string.Join(", ", messages.ToArray());
             var response = new ErrorResponse();
-            response.AddError(new Error("Package dimensions are not valid", "Range_Not_Satisfiable", 416, "INPUT"));
+            response.AddError(new Error($"Package dimensions are not valid: {errorMessages}", "Range_Not_Satisfiable", 416, "INPUT"));
             return BadRequest(response);
         }
     }
