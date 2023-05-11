@@ -13,7 +13,7 @@
             if (package.Height > MaxHeight) errors.Add($"MaxHeight: {MaxHeight}");
             if (package.Weight > MaxWeight) errors.Add($"MaxWeight: {MaxWeight}");
             if (package.Length > MaxLength) errors.Add($"MaxLength: {MaxLength}");
-            if (package.Width > MaxWidth) errors.Add($"MaxWidth: {MaxWidth}");
+            if (package.Width > MaxWidth)   errors.Add($"MaxWidth: {MaxWidth}");
 
             return errors;
         }

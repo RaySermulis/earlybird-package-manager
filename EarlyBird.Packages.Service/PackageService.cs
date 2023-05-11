@@ -1,5 +1,4 @@
 ﻿using EarlyBird.Packages.DAL.Mappers;
-using EarlyBird.Packages.DAL.Models;
 using EarlyBird.Packages.DAL.Repositories;
 
 namespace EarlyBird.Packages.Service

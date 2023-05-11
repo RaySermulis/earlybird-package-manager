@@ -6,19 +6,17 @@ namespace EarlyBird.Packages.DAL.Repositories
     public interface IPackageRepository
     {
         List<Package> GetAllPackages();
-        Package GetPackageDetails(int kolliid);
+        Package GetPackageDetails(long kolliid);
         bool CreatePackage(Package package);
     }
 
     public class PackageRepository : IPackageRepository
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly MemoryCacheEntryOptions memoryCacheEntryOptions;
 
         public PackageRepository(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
-            memoryCacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(new TimeSpan(0, 60, 0));
         }
 
         public List<Package> GetAllPackages()
@@ -27,7 +25,7 @@ namespace EarlyBird.Packages.DAL.Repositories
             return packages?.SelectMany(x => x.Values).ToList() ?? new List<Package>();
         }
 
-        public Package GetPackageDetails(int kolliid)
+        public Package GetPackageDetails(long kolliid)
         {
             var details = GetAllPackages()?.FirstOrDefault(x => x.Kolliid == kolliid);
             return details;
@@ -41,19 +39,19 @@ namespace EarlyBird.Packages.DAL.Repositories
                 throw new Exception("error: package already exists");
             }
 
-            var packages = GetCachePackages() ?? new List<Dictionary<int, Package>>();
+            var packages = GetCachePackages() ?? new List<Dictionary<long, Package>>();
             if (packages.Any(x => x.ContainsKey(package.Kolliid)))
             {
                 throw new Exception("error: package already exists");
             }
-            packages.Add(new Dictionary<int, Package> { { package.Kolliid, package } });
-            _memoryCache.Set("packages", packages, memoryCacheEntryOptions);
+            packages.Add(new Dictionary<long, Package> { { package.Kolliid, package } });
+            _memoryCache.Set("packages", packages);
             return true;
         }
 
-        private List<Dictionary<int, Package>> GetCachePackages()
+        private List<Dictionary<long, Package>> GetCachePackages()
         {
-            _memoryCache.TryGetValue("packages", out List<Dictionary<int, Package>> packages);
+            _memoryCache.TryGetValue("packages", out List<Dictionary<long, Package>> packages);
             return packages;
         }
     }

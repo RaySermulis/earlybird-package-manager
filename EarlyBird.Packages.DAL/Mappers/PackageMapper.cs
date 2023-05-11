@@ -21,7 +21,7 @@ namespace EarlyBird.Packages.DAL.Mappers
         {
             return new Package
             {
-                Kolliid = int.Parse(model.Kolliid),
+                Kolliid = long.Parse(model.Kolliid),
                 Height = model.Height,
                 Width = model.Width,
                 Length = model.Length,

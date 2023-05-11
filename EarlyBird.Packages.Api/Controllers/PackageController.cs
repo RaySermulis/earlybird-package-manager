@@ -42,16 +42,16 @@ namespace EarlyBird.Packages.Api.Controllers
             try
             {
                 var dimensionErrors = Validations.ValidateDimensions(packageModel);
-                var isKolliiFormatCorect = Validations.IsSearchKolliidValid(packageModel.Kolliid);
                 if (dimensionErrors.Count != 0)
                 {
                     return PackageDimensionsInvalid(dimensionErrors);
                 }
 
-                if (isKolliiFormatCorect)
+                if (Validations.IsSearchKolliidValid(packageModel.Kolliid))
                 {
                     return InvalidInputParameters();
                 }
+
                 _packageService.CreatePackage(packageModel);
                 return Ok();
             }
